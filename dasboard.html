@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocular AI Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-eye"></i>
+                <span>OCULAR-SCAN AI</span>
+            </div>
+           <ul style="list-style: none; padding: 0; font-family: sans-serif;">
+    <li style="background: #3498db; color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-gauge"></i> Dashboard
+    </li>
+
+    <li class="nav-item-hover" style="padding: 12px 20px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: 0.3s;">
+        <a href="index.html" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; width: 100%;">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+    </li>
+
+   
+</ul>
+        </nav>
+
+        <main class="main-content">
+            <header>
+                <h1>Ocular Disease Diagnostic Dashboard</h1>
+                <p>Upload a fundus image to start analysis</p>
+            </header>
+
+            <div class="dashboard-grid">
+                <section class="card upload-section">
+                    <h3><i class="fa-solid fa-cloud-arrow-up"></i> Patient Fundus Image</h3>
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" id="imageInput" accept="image/*" required>
+                        <p id="uploadText">Drag & drop or click to select image</p>
+                        <img id="imagePreview" style="display:none; width:100%; border-radius:10px; margin-top:10px;">
+                    </div>
+                    <button type="button" onclick="uploadAndPredict()" class="btn-predict" id="predictBtn">
+                        RUN AI ANALYSIS
+                    </button>
+                </section>
+
+                <section class="card results-section">
+                    <h3><i class="fa-solid fa-square-poll-vertical"></i> Analysis Result</h3>
+                    <div class="result-display">
+                        <div class="metric">
+                            <span>Predicted Class:</span>
+                            <strong id="class-name">--</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Confidence Score:</span>
+                            <strong id="confidence" class="highlight">0%</strong>
+                        </div>
+                        <div style="width: 100%; background: #eee; border-radius: 5px; height: 10px; margin-top: 15px;">
+                            <div id="progressFill" style="width: 0%; height: 100%; background: #2563eb; border-radius: 5px; transition: 0.5s;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card xai-section">
+                    <h3><i class="fa-solid fa-microscope"></i> Explainable AI (LIME)</h3>
+                    <div class="xai-container">
+                        <p>Highlighted regions indicate areas of diagnostic focus:</p>
+                        <img src="lime.jpeg"LIME Analysis" class="lime-img" id="limeImg">
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Disease Names Mapping
+        const labelMap = {
+            "A": "Age-related Macular Degeneration",
+            "C": "Cataract",
+            "D": "Diabetes Retinopathy",
+            "G": "Glaucoma",
+            "H": "Hypertension",
+            "M": "Myopia",
+            "N": "Normal Eye",
+            "O": "Other Abnormalities"
+        };
+
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('imagePreview');
+        const uploadText = document.getElementById('uploadText');
+
+        // Preview Image when selected
+        imageInput.onchange = evt => {
+            const [file] = imageInput.files;
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+                uploadText.style.display = 'none';
+            }
+        }
+
+        async function uploadAndPredict() {
+            const fileInput = document.getElementById('imageInput');
+            const classNameDisplay = document.getElementById("class-name");
+            const confidenceDisplay = document.getElementById("confidence");
+            const progressFill = document.getElementById("progressFill");
+            const btn = document.getElementById("predictBtn");
+
+            if (!fileInput.files[0]) {
+                alert("Please select an eye image first!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+
+            // UI feedback
+            classNameDisplay.innerText = "Analyzing...";
+            btn.innerText = "PROCESSING...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.prediction) {
+                    // Success! Mapping the short label (A, C, D) to full name
+                    const fullName = labelMap[data.prediction] || data.prediction;
+                    classNameDisplay.innerText = fullName;
+                    confidenceDisplay.innerText = data.confidence + "%";
+                    progressFill.style.width = data.confidence + "%";
+                } else {
+                    alert("Error: " + data.error);
+                    classNameDisplay.innerText = "--";
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Backend server error! Make sure Flask is running.");
+                classNameDisplay.innerText = "Error";
+            } finally {
+                btn.innerText = "RUN AI ANALYSIS";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

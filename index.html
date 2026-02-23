@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OcularAI - Eye Disease Prediction</title>
+    
+    <style>
+        /* 1. RESET & BASIC SETUP */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            /* This mimics your dark blue gradient. 
+               Once you have your image, uncomment the background-image line below. */
+            background: linear-gradient(135deg, #1a1a40 0%, #302b63 100%);
+            background-image: url('bg-pattern.jpg');
+            background-size: cover;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 2. NAVIGATION BAR */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 30px; /* Adjust based on your logo export */
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6; /* Bright Blue */
+            color: white;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        /* 3. HERO SECTION (The Main Content) */
+        .hero {
+            display: flex;
+            align-items: center; /* Vertically center */
+            justify-content: space-between;
+            padding: 0 50px;
+            flex: 1; /* Takes up remaining height */
+            gap: 40px;
+        }
+
+        /* Left Side Text */
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e0e7ff; /* Slightly lighter white */
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #cbd5e1; /* Grey-ish text for description */
+            max-width: 80%;
+        }
+
+        /* Right Side Image */
+        .hero-image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* The glowing border effect wrapper */
+        .image-frame {
+            padding: 15px; /* Space for the border/glow */
+            background: rgba(255, 255, 255, 0.1); /* Glass effect */
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); /* Blue glow */
+        }
+
+        .image-frame img {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            display: block;
+        }
+
+        /* 4. RESPONSIVE (Mobile view) */
+        @media (max-width: 900px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 40px 20px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+
+            .hero-content {
+                margin-bottom: 40px;
+            }
+            
+            p {
+                margin: 0 auto;
+            }
+            
+            nav {
+                display: none; /* Hiding nav links on small mobile for simplicity */
+            }
+        }
+        /* 5. DISEASES SECTION */
+        .detect-section {
+    padding: 80px 50px;
+    text-align: center;
+    background-image: url('bg-detect.png'); 
+    background-size: cover;
+}
+
+        .detect-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: white;
+        }
+
+        .disease-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap; 
+        }
+
+        .disease-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 220px;
+        }
+
+        .image-box {
+            background: white;
+            border-radius: 30px; 
+            padding: 10px;
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .image-box img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .disease-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            line-height: 1.4;
+        }
+        /* 6. KEY FEATURES SECTION */
+        .features-section {
+            background-image: url('bg-features.png');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 50px;
+            text-align: center;
+            color: #333; /* Dark text for light background */
+        }
+
+        .features-section h2 {
+            font-size: 2.5rem;
+            color: #4f46e5; /* Purple color from your design */
+            margin-bottom: 50px;
+            font-weight: 700;
+        }
+
+        .features-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 20px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Soft shadow */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature-card img {
+            height: 80px;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
+
+        .feature-card h3 {
+            color: #3b82f6; /* Blue text */
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #000; /* Black text */
+            font-size: 1rem;
+        }
+
+        /* Footer Buttons */
+        .features-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .disclaimer {
+            border: 1px solid #3b82f6;
+            color: #1e3a8a;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <nav>
+            <a href="#detect">What We Detect</a>
+            <a href="#features">Key Features</a>
+        </nav>
+        <a href="dasboard.html" class="btn-primary">Go To Dashboard</a>
+    </header>
+
+    <section class="hero">
+        
+        <div class="hero-content">
+            <h1>Eye Disease Prediction</h1>
+            <h2>Using Machine Learning With Explainable AI</h2>
+            <p>Utilizing advanced machine learning to detect and classify eye diseases with explainable insights</p>
+        </div>
+
+        <div class="hero-image-container">
+            <div class="image-frame">
+                <img src="hero-image.png" alt="Doctor Analysis Interface">
+            </div>
+        </div>
+
+    </section>
+    <section class="detect-section" id="detect">
+        <h2>Diseases We Detect</h2>
+        
+        <div class="disease-grid">
+            
+            <div class="disease-card">
+                <div class="image-box">
+                    <img src="eye-glaucoma.png" alt="Glaucoma Eye">
+                </div>
+                <h3>Glaucoma</h3>
+            </div>
+
+            <div class="disease-card">
+                <div class="image-box">
+                    <img src="eye-diabetic.png" alt="Diabetic Retinopathy Eye">
+                </div>
+                <h3>Diabetic<br>Retinopathy</h3>
+            </div>
+            <div class="disease-card">
+                <div class="image-box">
+                    <img src="eye-macular.png" alt="Macular Degeneration Eye">
+                </div>
+                <h3>Age-Related<br>Macular Degeneration</h3>
+            </div>
+            <div class="disease-card">
+                <div class="image-box">
+                    <img src="eye-cataract.png" alt="Cataract Eye">
+                </div>
+                <h3>Cataract &<br>Normal Eye</h3>
+            </div>
+        </div>
+    </section>
+    <section class="features-section" id="features">
+        <h2>Key Features</h2>
+        
+        <div class="features-grid">
+            
+            <div class="feature-card">
+                <img src="icon-ml.png" alt="ML Prediction">
+                <h3>MI-Based Prediction</h3>
+                <p>Accurate Disease Diagnose</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="icon-confidence.png" alt="Confidence Score">
+                <h3>Confidence Score</h3>
+                <p>Prediction Confidence Level</p>
+            </div>
+
+            <div class="feature-card">
+                <img src="icon-xai.png" alt="Explainable AI">
+                <h3>Explainable AI</h3>
+                <p>Visualize Affected Areas</p>
+            </div>
+
+        </div>
+
+        <div class="features-footer">
+            <a href="dasboard.html" class="btn-primary">Go To Dashboard</a>
+            <div class="disclaimer">For Research And Educational Purposes Only</div>
+        </div>
+
+    </section>
+</body>
+</html>
